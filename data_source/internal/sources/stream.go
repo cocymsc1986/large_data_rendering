@@ -59,6 +59,16 @@ func (l *partitionLog) append(r Record) {
 	l.nextOffset++
 }
 
+// reset empties the log and rewinds offsets to zero, keeping the allocation.
+func (l *partitionLog) reset() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.start = 0
+	l.count = 0
+	l.baseOffset = 0
+	l.nextOffset = 0
+}
+
 // offsets returns the earliest retained and the high-water (next) offset.
 func (l *partitionLog) offsets() (earliest, next int64) {
 	l.mu.RLock()
@@ -219,6 +229,22 @@ func (s *StreamSource) produceBatch() {
 		s.produced++
 	}
 	s.mu.Unlock()
+}
+
+// Reset clears every partition log, rewinds all offsets to zero and zeroes the
+// produced counter. The running state is left untouched. Note: connected
+// consumers holding a cursor ahead of the rewound offsets will see no records
+// until production catches back up past their position.
+func (s *StreamSource) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, parts := range s.logs {
+		for _, lg := range parts {
+			lg.reset()
+		}
+	}
+	s.produced = 0
+	s.nextGen = 0
 }
 
 // StreamStatus describes the producer for the control API.

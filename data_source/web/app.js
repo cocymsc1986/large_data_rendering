@@ -86,6 +86,15 @@ document.querySelectorAll('button[data-source]').forEach((btn) => {
 
 $('stream-pps').addEventListener('input', (e) => { e.target.dataset.touched = '1'; });
 
+$('reset-all').addEventListener('click', async () => {
+  try {
+    await api('/api/sources/reset', { method: 'POST' });
+    refreshStatus();
+  } catch (e) {
+    alert(`Failed to reset: ${e.message}`);
+  }
+});
+
 // ---- live SSE tail --------------------------------------------------------
 
 let es = null;

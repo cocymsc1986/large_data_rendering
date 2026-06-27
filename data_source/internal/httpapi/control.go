@@ -53,6 +53,29 @@ func (s *Server) handleStart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// handleReset clears stored data and zeroes the produced counter for one source
+// (path "/api/sources/{name}/reset") without changing its running state.
+func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+	switch name {
+	case "timeseries":
+		s.ts.Reset()
+		writeJSON(w, http.StatusOK, s.ts.Status())
+	case "stream":
+		s.stream.Reset()
+		writeJSON(w, http.StatusOK, s.stream.Status())
+	default:
+		writeErr(w, http.StatusNotFound, "unknown source: "+name+" (use 'timeseries' or 'stream')")
+	}
+}
+
+// handleResetAll resets both sources in one call (path "/api/sources/reset").
+func (s *Server) handleResetAll(w http.ResponseWriter, r *http.Request) {
+	s.ts.Reset()
+	s.stream.Reset()
+	s.handleStatus(w, r)
+}
+
 func (s *Server) handleStop(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("name")
 	switch name {

@@ -28,6 +28,7 @@
       <div class="actions">
         <button data-source="timeseries" data-action="start" class="primary">Start</button>
         <button data-source="timeseries" data-action="stop">Stop</button>
+        <button data-source="timeseries" data-action="reset">Reset</button>
       </div>
     </section>
 
@@ -47,6 +48,7 @@
         <label>rate <input id="stream-pps" type="number" min="1" step="50" value="200" /> pts/s</label>
         <button data-source="stream" data-action="start" class="primary">Start</button>
         <button data-source="stream" data-action="stop">Stop</button>
+        <button data-source="stream" data-action="reset">Reset</button>
       </div>
 
       <div class="live">
@@ -84,6 +86,7 @@
   </main>
 
   <footer>
+    <button id="reset-all">Reset all counters</button>
     <span id="conn" class="muted">connecting…</span>
   </footer>
 
