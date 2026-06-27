@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>data_source · control</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>data_source</h1>
+    <p class="sub">Mock data sources for large-dataset rendering — toggle the sources your consumer app subscribes to.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="card-head">
+        <h2>Time series</h2>
+        <span id="ts-badge" class="badge off">off</span>
+      </div>
+      <p class="desc">Continuously appends one point per series into queryable ring buffers. Query a window via
+        <code>GET /api/timeseries?seriesId=&amp;from=&amp;to=&amp;maxPoints=</code> (server-side downsampled).</p>
+      <dl class="stats">
+        <div><dt>series</dt><dd id="ts-series">–</dd></div>
+        <div><dt>produced</dt><dd id="ts-produced">–</dd></div>
+        <div><dt>resolution</dt><dd id="ts-res">–</dd></div>
+      </dl>
+      <div class="actions">
+        <button data-source="timeseries" data-action="start" class="primary">Start</button>
+        <button data-source="timeseries" data-action="stop">Stop</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Stream <span class="tag">Kafka-style · SSE</span></h2>
+        <span id="stream-badge" class="badge off">off</span>
+      </div>
+      <p class="desc">Produces records onto partitioned, offset-addressed topic logs. Consume via SSE
+        <code>GET /stream/sse?topic=</code> or poll <code>GET /api/stream/poll?topic=&amp;offset=</code>.</p>
+      <dl class="stats">
+        <div><dt>topics</dt><dd id="stream-topics">–</dd></div>
+        <div><dt>partitions</dt><dd id="stream-partitions">–</dd></div>
+        <div><dt>produced</dt><dd id="stream-produced">–</dd></div>
+      </dl>
+      <div class="actions">
+        <label>rate <input id="stream-pps" type="number" min="1" step="50" value="200" /> pts/s</label>
+        <button data-source="stream" data-action="start" class="primary">Start</button>
+        <button data-source="stream" data-action="stop">Stop</button>
+      </div>
+
+      <div class="live">
+        <div class="live-head">
+          <label>topic
+            <select id="live-topic"></select>
+          </label>
+          <button id="live-toggle">Tail via SSE</button>
+          <span id="live-rate" class="muted">–</span>
+        </div>
+        <pre id="live-log" class="log" aria-live="polite"></pre>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Bulk dump <span class="tag">static</span></h2>
+        <span class="badge on">always available</span>
+      </div>
+      <p class="desc">Streams a freshly generated dataset of N points. Load it into your consumer to test
+        loading/parsing/rendering a static file.</p>
+      <div class="actions wrap">
+        <label>count <input id="dump-count" type="number" min="1" step="50000" value="500000" /></label>
+        <label>format
+          <select id="dump-format">
+            <option value="json">json</option>
+            <option value="ndjson">ndjson</option>
+            <option value="csv">csv</option>
+          </select>
+        </label>
+        <a id="dump-download" class="btn primary" href="#" download>Download</a>
+        <a id="dump-open" class="btn" href="#" target="_blank" rel="noopener">Open in tab</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span id="conn" class="muted">connecting…</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

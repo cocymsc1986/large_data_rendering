@@ -1,5 +1,6 @@
-node_modules/
-dist/
-data/
+/bin/
+*.exe
+*.out
 *.log
+dump.*
 .DS_Store
