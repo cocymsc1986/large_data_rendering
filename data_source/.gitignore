@@ -2,5 +2,8 @@
 *.exe
 *.out
 *.log
-dump.*
+# Downloaded dump output files (anchored to repo root so it never matches source like dump.go)
+/dump.json
+/dump.ndjson
+/dump.csv
 .DS_Store
