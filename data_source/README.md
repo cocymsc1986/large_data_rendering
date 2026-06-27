@@ -71,6 +71,9 @@ alive rather than random.
 - `POST /api/sources/timeseries/stop`
 - `POST /api/sources/stream/start` — body `{ "pps": 200 }` (optional rate).
 - `POST /api/sources/stream/stop`
+- `POST /api/sources/{name}/reset` — clear stored data and zero the `produced`
+  counter for one source (offsets rewind to 0); running state is unchanged.
+- `POST /api/sources/reset` — reset both sources at once.
 
 ### Time series (query a window to draw a chart)
 - `GET /api/timeseries/series` — list every series with point counts and bounds.

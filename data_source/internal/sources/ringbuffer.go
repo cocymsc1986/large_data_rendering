@@ -43,6 +43,13 @@ func (r *ringBuffer) push(ts int64, value float64) {
 
 func (r *ringBuffer) size() int { return r.count }
 
+// reset empties the buffer, keeping the underlying allocation. Stale slots are
+// left in place but become unreachable.
+func (r *ringBuffer) reset() {
+	r.start = 0
+	r.count = 0
+}
+
 // bounds returns the oldest/newest timestamps held, and ok=false when empty.
 func (r *ringBuffer) bounds() (from, to int64, ok bool) {
 	if r.count == 0 {

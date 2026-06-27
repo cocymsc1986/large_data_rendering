@@ -92,4 +92,4 @@ input[type=number] { width: 92px; }
 }
 .muted { color: var(--muted); font-size: 12px; }
 
-footer { max-width: 1100px; margin: 0 auto; padding: 0 24px 32px; }
+footer { max-width: 1100px; margin: 0 auto; padding: 0 24px 32px; display: flex; align-items: center; gap: 14px; }

@@ -108,6 +108,17 @@ func (s *TimeSeriesSource) loop(stopCh chan struct{}) {
 	}
 }
 
+// Reset clears all stored points and zeroes the produced counter. The running
+// state is left untouched; if running, generation simply continues from empty.
+func (s *TimeSeriesSource) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, buf := range s.store {
+		buf.reset()
+	}
+	s.produced = 0
+}
+
 // Status describes the source for the control API.
 type Status struct {
 	Running     bool   `json:"running"`

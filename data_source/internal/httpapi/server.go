@@ -30,8 +30,10 @@ func (s *Server) Handler() http.Handler {
 
 	// Control API — toggle sources on/off and read status.
 	mux.HandleFunc("GET /api/sources", s.handleStatus)
+	mux.HandleFunc("POST /api/sources/reset", s.handleResetAll)
 	mux.HandleFunc("POST /api/sources/{name}/start", s.handleStart)
 	mux.HandleFunc("POST /api/sources/{name}/stop", s.handleStop)
+	mux.HandleFunc("POST /api/sources/{name}/reset", s.handleReset)
 
 	// Time-series query API.
 	mux.HandleFunc("GET /api/timeseries/series", s.handleSeriesList)
