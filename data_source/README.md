@@ -92,10 +92,45 @@ alive rather than random.
   Returns `{count, cursor, records}`; poll again with the returned `cursor`.
 
 ### Bulk dump (static dataset)
-- `GET /api/dump?count=500000&format=ndjson&devices=50&window=24&download=1`
+- `GET /api/dump?count=500000&format=ndjson&devices=50&window=24&seed=1&download=1`
   - `format` = `json` | `ndjson` | `csv`.
   - Streamed point-by-point, so memory stays flat regardless of `count`
     (500k rows generate in well under a second).
+  - **Deterministic**: the dataset is a pure function of `seed` + the time
+    window, so the same params always yield the same data. The window defaults
+    to `[now-window, now]`; pin it with `start`/`end` (epoch ms) for a
+    byte-identical static file across requests.
+
+#### Cursor-based pagination (optional)
+Add `limit` (and/or `cursor`) to page through the dataset instead of streaming
+it whole. Because the data is deterministic, paging is coherent and stateless —
+each point is produced in O(1), no server-side scan state.
+
+- `GET /api/dump?count=500000&limit=10000` → first page.
+- The response includes an opaque `nextCursor`; fetch the next page with
+  `GET /api/dump?cursor=<nextCursor>`. `nextCursor` is omitted on the last page.
+- `limit` is capped at 200000; an explicit `limit` overrides the cursor's
+  remembered page size.
+
+```jsonc
+// GET /api/dump?count=500000&limit=10000   (format=json, default)
+{ "offset": 0, "limit": 10000, "count": 500000, "returned": 10000,
+  "hasMore": true, "nextCursor": "eyJzIjox…", "records": [ /* … */ ] }
+```
+
+For `format=ndjson|csv` the page rows are streamed as usual and the cursor
+metadata comes back in headers: `X-Next-Cursor`, `X-Has-More`, `X-Total-Count`,
+`X-Offset`.
+
+```js
+// Page through the whole dataset.
+let url = '/api/dump?count=500000&limit=20000';
+while (url) {
+  const page = await (await fetch(url)).json();
+  render(page.records);
+  url = page.nextCursor ? `/api/dump?cursor=${page.nextCursor}` : null;
+}
+```
 
 ## Consuming examples
 
